@@ -1,7 +1,6 @@
 package api
 
 import (
-	"io"
 	"net/http"
 )
 
@@ -17,6 +16,7 @@ func (c *Controller) ParseURL(url string) string {
 type API struct {
 	Controller Controller
 	data       string
+	rWriter    http.ResponseWriter
 }
 
 func (a *API) ServeHTTP(w http.ResponseWriter, r *http.Request) {
@@ -24,5 +24,13 @@ func (a *API) ServeHTTP(w http.ResponseWriter, r *http.Request) {
 	w.WriteHeader(http.StatusOK)
 
 	a.data = a.Controller.ParseURL(r.URL.Path)
-	io.WriteString(w, a.data)
+	a.rWriter = w
+}
+
+func (a *API) GetHTTPWriter() http.ResponseWriter {
+	return a.rWriter
+}
+
+func (a *API) GetData() string {
+	return a.data
 }
