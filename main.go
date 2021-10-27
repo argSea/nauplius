@@ -28,8 +28,9 @@ func (e *APIEndpoint) AddNewEndpoint(end string, function func(w http.ResponseWr
 	e.endpoints = append(e.endpoints, a)
 }
 
-func (e *APIEndpoint) FindEndpoint(end string) func(w http.ResponseWriter) {
+func (e *APIEndpoint) FindEndpoint(end string, w http.ResponseWriter) func(w http.ResponseWriter) {
 	for _, value := range e.endpoints {
+		io.WriteString(w, value.endpoint)
 		if value.endpoint == end {
 			return value.function
 		}
@@ -53,7 +54,9 @@ func (a *Router) ServeHTTP(w http.ResponseWriter, r *http.Request) {
 	w.WriteHeader(http.StatusOK)
 
 	data := a.Controller.ParseURL(r.URL.Path)
-	this_func := a.endpoints.FindEndpoint(data)
+
+	io.WriteString(w, data)
+	this_func := a.endpoints.FindEndpoint(data, w)
 
 	this_func(w)
 }
