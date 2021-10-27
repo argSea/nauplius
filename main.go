@@ -45,8 +45,8 @@ func (e *APIEndpoint) BaseFunction(w http.ResponseWriter) {
 
 //Listens and finds the route
 type Router struct {
-	Controller Controller
-	endpoints  APIEndpoint
+	Controller  Controller
+	APIEndpoint APIEndpoint
 }
 
 func (a *Router) ServeHTTP(w http.ResponseWriter, r *http.Request) {
@@ -56,7 +56,7 @@ func (a *Router) ServeHTTP(w http.ResponseWriter, r *http.Request) {
 	data := a.Controller.ParseURL(r.URL.Path)
 
 	io.WriteString(w, data)
-	this_func := a.endpoints.FindEndpoint(data, w)
+	this_func := a.APIEndpoint.FindEndpoint(data, w)
 
 	this_func(w)
 }
