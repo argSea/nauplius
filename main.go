@@ -8,6 +8,11 @@ import (
 //Controller struct to handle API requests
 type Controller struct{}
 
+//ParseURL parses the URL
+func (c *Controller) ParseURL(url string) string {
+	return ("{\"path\":\"" + url + "\"}")
+}
+
 //API is our API handler
 type API struct {
 	Controller Controller
@@ -19,9 +24,4 @@ func (a *API) ServeHTTP(w http.ResponseWriter, r *http.Request) {
 
 	data := a.Controller.ParseURL(r.URL.Path)
 	io.WriteString(w, data)
-}
-
-//ParseURL parses the URL
-func (c *Controller) ParseURL(url string) string {
-	return ("{\"path\":\"" + url + "\"}")
 }
