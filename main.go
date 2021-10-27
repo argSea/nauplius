@@ -1,6 +1,7 @@
 package api
 
 import (
+	"io"
 	"net/http"
 )
 
@@ -12,25 +13,47 @@ func (c *Controller) ParseURL(url string) string {
 	return ("{\"path\":\"" + url + "\"}")
 }
 
-//API is our API handler
+//Our API endpoints
 type API struct {
-	Controller Controller
-	data       string
-	rWriter    http.ResponseWriter
+	endpoint string
+	function func(w http.ResponseWriter)
 }
 
-func (a *API) ServeHTTP(w http.ResponseWriter, r *http.Request) {
+type APIEndpoint struct {
+	endpoints []API
+}
+
+func (e *APIEndpoint) AddNewEndpoint(end string, function func(w http.ResponseWriter)) {
+	a := API{endpoint: end, function: function}
+	e.endpoints = append(e.endpoints, a)
+}
+
+func (e *APIEndpoint) FindEndpoint(end string) func(w http.ResponseWriter) {
+	for _, value := range e.endpoints {
+		if value.endpoint == end {
+			return value.function
+		}
+	}
+
+	return e.BaseFunction
+}
+
+func (e *APIEndpoint) BaseFunction(w http.ResponseWriter) {
+	io.WriteString(w, "Hello World!")
+}
+
+//Listens and finds the route
+type Router struct {
+	Controller Controller
+	endpoints  APIEndpoint
+}
+
+func (a *Router) ServeHTTP(w http.ResponseWriter, r *http.Request) {
 	w.Header().Set("Content-type", "application/json")
 	w.WriteHeader(http.StatusOK)
 
-	a.data = a.Controller.ParseURL(r.URL.Path)
-	a.rWriter = w
-}
+	data := a.Controller.ParseURL(r.URL.Path)
+	this_func := a.endpoints.FindEndpoint(data)
 
-func (a *API) GetHTTPWriter() http.ResponseWriter {
-	return a.rWriter
-}
-
-func (a *API) GetData() string {
-	return a.data
+	this_func(w)
 }
