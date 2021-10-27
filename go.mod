@@ -1,3 +1,3 @@
-module github.com/argSea/api-router
+module github.com/argSea/nauplius
 
 go 1.13
