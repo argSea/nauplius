@@ -79,5 +79,7 @@ func (a *Router) ServeHTTP(w http.ResponseWriter, r *http.Request) {
 	w.Header().Set("Content-type", "application/json")
 	w.WriteHeader(http.StatusOK)
 
-	a.Controller.ParseURL(w, r.URL.Path)
+	response := a.Controller.ParseURL(w, r.URL.Path)
+
+	io.WriteString(w, response)
 }
