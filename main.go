@@ -8,9 +8,26 @@ import (
 
 //API Item and response struct, for returning our API data. API items is mutable
 type APIResponse struct {
-	Status string
-	Code   int
-	Items  map[string]string
+	status  string
+	code    int
+	message string
+	items   map[string]interface{}
+}
+
+func (r *APIResponse) SetStatus(status string) {
+	r.status = status
+}
+
+func (r *APIResponse) SetCode(code int) {
+	r.code = code
+}
+
+func (r *APIResponse) SetMessage(message string) {
+	r.message = message
+}
+
+func (r *APIResponse) SetItems(items map[string]interface{}) {
+	r.items = items
 }
 
 //Our API endpoints
@@ -61,13 +78,12 @@ func (e *APIEndpoint) FindEndpoint(end string, w http.ResponseWriter) func(r *AP
 func (e *APIEndpoint) BaseFunction(r *APIResponse) {
 	// io.WriteString(w, "Hello World!")
 
-	r.Status = "ok"
-	r.Code = 200
-	r.Items = make(map[string]string)
+	items := make(map[string]interface{})
 
-	r.Items["message"] = "API not found"
-
-	// return &APIResponse{}
+	r.SetStatus("error")
+	r.SetCode(404)
+	r.SetMessage("API Not Found")
+	r.SetItems(items)
 }
 
 //Listens and finds the route
